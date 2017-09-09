@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #define VACIO 0
 #define TAM 1000
+// Macro para obtener el tamaño de un vector
+#define length(vector) (sizeof(vector)/sizeof(*(vector)))
 // Macro para detectar el sistema operativo ejecutando el programa
 #ifdef __linux__
 #define OS "linux"
@@ -25,22 +27,30 @@ struct Infraccion {
     char fechahora[14];
     float monto;
     int conductorID;
-    int codProvicia;
+    char Provicia[23];
 };
 
-void inicializar(Conductor cond1[]);
-unsigned int tamVector(Conductor cond1[]);
-void guardarConductor(Conductor cond1[]);
-void cargarConductor(Conductor cond1[]);
+void limpiar();
+void pausa();
 void cargarArchivo(Conductor x[]);
+void inicializar(Conductor infractores[]);
+Conductor cargarConductor();
+void comenzarJornada(Conductor infractores[]);
+void guardarConductor(Conductor infreactores[]);
+unsigned int conductoresTotales(Conductor infractores[]);
+bool registrar(Conductor infractor);
+void generarConducores();
+void generarInfracciones();
+bool fechaValida(unsigned int fecha);
 
 int main(void){
-    string provincia[23] = { "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Corrientes", "Cordoba", "Entre Rios", "Formosa", "Jujuy", "Neuquen", "Mendoza", "Misiones", "La Pampa", "La Rioja", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe","Santiago del Estero", "Tierra del Fuego", "Tucuman"};
-    unsigned int select, conductorID;
-    Conductor cond1[TAM];
-    inicializar(cond1);
-    unsigned int opcion = 0;
-    char provincia[20];
+    string const mes[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+    string  const provincia[23] = { "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Corrientes", "Cordoba", "Entre Rios", "Formosa", "Jujuy", "Neuquen", "Mendoza", "Misiones", "La Pampa", "La Rioja", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe","Santiago del Estero", "Tierra del Fuego", "Tucuman"};
+    unsigned int select, conductorID, opcion = 0, ultimo;
+    Conductor infractores[TAM];
+    inicializar(infractores);
+    generarConducores();
+
     while(true){
         switch(opcion){
             case 0:
@@ -60,7 +70,9 @@ int main(void){
                 limpiar();
                 break;
             case 1:
-                //comenzarJornada()
+                //comenzarJornada(infractor);
+                cout << "Comenzo la jornada" << endl;
+                pausa();
                 opcion = 0;
                 break;
             case 2:
@@ -68,26 +80,35 @@ int main(void){
                 opcion = 0;
                 break;
             case 3:
-                cargarConductor(cond1);
+                ultimo = conductoresTotales(infractores);
+                if(ultimo <= TAM){
+                    infractores[ultimo] = cargarConductor();
+                    cout << "Conductor agregado con exito" << endl;
+                } else {
+                    cout << "ERROR: No se pueden agregar mas conductores hasta finalizar la jornada " << endl;
+                }
+                pausa();
                 opcion = 0;
                 break;
             case 4:
                 cout << "Escriba el ID del conductor a desactivar: " << endl;
                 cin >> conductorID;
                 //desactivarConductor(conductorID);
+                pausa();
                 opcion = 0;
                 break;
             case 5:
                 cout << "[0] Buscar por ID" << endl;
                 cout << "[1] Buscar por E-mail" << endl;
-                cout << "Seleccione una opcion:  " << endl
+                cout << "Seleccione una opcion:  " << endl;
                 cin >> select;
-                /*cond1 = (select == 0)? buscarXid() : buscarXemail();
-                if(cond1.conductorID == VACIO){
+                /*buscado = (select == 0)? buscarXid() : buscarXemail();
+                if(buscado.conductorID == VACIO){
                     cout << "No se encontro al conductor";
                 } else {
-                    //mostrarDatos(cond1);
+                    //mostrarDatos(buscado);
                 }*/
+                pausa();
                 opcion = 0;
                 break;
             case 6:
@@ -126,11 +147,14 @@ int main(void){
                     cout << "SELECCIONES UNA PROVINCIA: " << endl;
                     cin >> select;
                     limpiar();
-                    //infraccionesXprovicia(provincia[select]);
-                } while((select < 0) || (22 < select));
+                } while(22 < select);
+                opcion = 0;
+                //infraccionesXprovicia(provincia[select]);
+                pausa();
                 break;
             case 9:
                 //finalizarJornada()
+                opcion = 0;
                 break;
             case 10:
                 cout << "Gracias por utilizar este programa";
@@ -143,42 +167,91 @@ int main(void){
     }
 }
 
+void generarInfracciones(){}
+
+void generarConducores(){
+    FILE *archivo;
+    Conductor prueba[20];
+    for(int i=0 ; i<20 ; i++){
+        prueba[i].ConductorID = i;
+        prueba[i].FechaVencimiento = (i+1)*1000000+(82020); // 'i' de agosto de 2020
+        prueba[i].Activo = (i%2 == 0)? true : false;
+        prueba[i].Infracciones = i%3;
+    }
+    archivo = fopen("conductores.bin","wb");
+    if(!archivo){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return;
+    }
+    fwrite(prueba, sizeof(Conductor),20, archivo);
+    fclose(archivo);
+}
+
+void comenzarJornada(Conductor infractores[]) {
+    FILE *conductores;
+    conductores = fopen("conductores.bin", "rb");
+    if(!conductores){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return;
+    }
+    fread(infractores, sizeof(Conductor), 1000, conductores);
+    fclose(conductores);
+}
+
 void inicializar(Conductor cond1[]){
     for(unsigned int i=0; i<TAM ; i++) {
-            cond1[i].ConductorID=VACIO;
+            cond1[i].ConductorID = VACIO;
     }
-}
-unsigned int tamVector(Conductor cond1[]) {
-    unsigned int i;
-    for( i ; cond1[i].ConductorID!=VACIO ; i++ );
-    return (i+1);
 }
 
 void guardarConductor(Conductor cond1[]) {
     FILE* archivo;
-    archivo =fopen("conductores.bin","wb");
+    archivo = fopen("conductores.bin","ab");
+    if(!archivo){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return;
+    }
     fwrite(cond1, sizeof(Conductor),1, archivo);
     fclose(archivo);
 }
 
-void cargarConductor(Conductor cond1[]) {
-    int i=tamVector(cond1);
+Conductor cargarConductor() {
+    Conductor infractor;
+    bool registrado = false;
     cout << "Ingrese el ID del conductor"<<endl;
-    cin >> cond1[i].ConductorID;
+    cin >> infractor.ConductorID;
     cout << "Ingrese la fecha de vencimiento de la licencia del conductor en formato AAAAMMDD"<<endl;
-    cin >> cond1[i].FechaVencimiento;
-    cout << "Ingrese 1 si el estado de el conductor es activo, de lo contrario ingrese 0"<<endl;
-    cin >> cond1[i].Activo;
+    do{
+        cin >> infractor.FechaVencimiento;
+    }while(!fechaValida(infractor.FechaVencimiento));
     cout << "Ingrese el Total de infracciones del conductor"<<endl;
-    cin >> cond1[i].Infracciones;
-    cout << "Ingrese el mail del conductor"<<endl;
-    cin >> cond1[i].Email;
-    guardarConductor(cond1);
+    cin >> infractor.Infracciones;
+    if(infractor.Infracciones>=3){
+        infractor.Activo = false;
+    } else {
+        cout << "Ingrese 1 si el estado de el conductor es activo, de lo contrario ingrese 0"<<endl;
+        cin >> infractor.Activo;
+    }
+    cout << "Ingrese el mail del conductor (hasta 50 caracteres)"<<endl;
+    cin >> infractor.Email;
+    limpiar();
+    //registrado = registrar(infractor);    Esta funcion tiene que encargarse de buscar si un conductor ya se habia registrado
+    if(registrado == true){
+        cout << "Conductor registrado con exito" << endl;
+    } else {
+        infractor.ConductorID = VACIO;
+        cout << "ERROR: El conductor ya se encuentra registrado" << endl;
+    }
+    return infractor;
 }
 
 void cargarArchivo(Conductor x[]) {
     FILE* archivo;
-    f=fopen("conductores.bin", "rb");
+    archivo = fopen("conductores.bin", "rb");
+    if(!archivo){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return;
+    }
     fseek(archivo ,0 ,SEEK_END);
     int tam = ftell(archivo)/sizeof(Conductor);
     fseek(archivo ,0 ,SEEK_SET);
@@ -187,10 +260,34 @@ void cargarArchivo(Conductor x[]) {
     cout << "El archivo ha sido cargado exitosamente" <<endl;
 }
 
+unsigned int conductoresTotales(Conductor infractores[]){
+    unsigned int i;
+    for(i=0 ; infractores[i].ConductorID!=VACIO && i<TAM ; i++)
+    return i;
+}
+
 void limpiar() {
     if(OS == "linux"){
         system("clear");    //Limpia la consola si el SO es GNU/Linux
     } else {
         system("cls");      //Limpia la consola si el SO es Windows
     }
+}
+
+void pausa(){
+    char seguir[1];
+    cout << "Presione ENTER para continuar";
+    cin.ignore();
+    cin.getline(seguir,0);
+    limpiar();
+}
+
+bool fechaValida(unsigned int fecha){
+    bool validez;
+    unsigned const short diasDelMes[12] ={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    unsigned int dd, mm;
+    dd = fecha/1000000;
+    mm =(fecha-dd)/10000;
+    validez = ((dd>diasDelMes[mm-1] || dd<1) && (mm<1 || mm>12))? false : true;
+    return validez;
 }
