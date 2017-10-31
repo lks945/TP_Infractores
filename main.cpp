@@ -11,8 +11,10 @@
 #else
 #define OS "noLinux"
 #endif
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 using namespace std;
+
+// ---------------------------- ESTRUCTURAS ---------------------------- //
 
 struct Conductor {
  unsigned int ConductorID;
@@ -21,55 +23,72 @@ struct Conductor {
  int Infracciones;
  char Email[50];
 };
+
 struct Infraccion {
-    int infraccionID;
-    char fechahora[14];
-    float monto;
-    int conductorID;
-    char Provicia[23];
+    int InfraccionID;
+    char FechaHora[14];
+    float Monto;
+    int ConductorID;
+    char Provincia[23];
 };
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- PROTOTIPOS DE FUNCIONES ---------------------------- //
+
+bool InfraccionesXProvincia ( char provincia[], Conductor conductores[] );
+void mostrarInfraccion(Infraccion actual);
 void archivarConductor(Conductor infractor);
-void verInfractores(Conductor infractores[]);
-void verTodos(const Conductor infractores[]);   //linea
-void verInactivos(Conductor infractores[]);
-void verActivos(Conductor infractores[]);
-void buscarConductor(Conductor infractores[]);
-void generarConducores(void);   //linea
-void generarInfracciones(void);   //linea
-void inicializar(Conductor infractores[]);   //linea
+void verInfractores(Conductor conductores[]);
+void verTodos(const Conductor conductores[]);   //linea
+void verInactivos(Conductor conductores[]);
+void verActivos(Conductor conductores[]);
+void buscarConductor(Conductor conductores[]);
+void generarConducores();   //linea
+void generarInfracciones();   //linea
+void inicializar(Conductor conductores[]);   //linea
 void mostrarDatos(const Conductor infractor);   //linea
-bool buscarXid(const Conductor infractores[], unsigned int &idBuscado);   //linea
-bool buscarXcorreo(const Conductor infractores[], unsigned int &indice);   //linea
-void cargarArchivoDeConductores(Conductor conductorParaCargar[]);   //linea
-Conductor nuevoConductor(const Conductor infractores[]);   //linea
-unsigned int conductoresTotales(Conductor infractores[]);   //linea
-void desactivarConductor(Conductor infractores[], unsigned int conductorID);   //linea
+bool buscarXid(const Conductor conductores[], unsigned int &idBuscado);   //linea
+bool buscarXcorreo(const Conductor conductores[], unsigned int &indice);   //linea
+void cargarArchivoDeConductores(Conductor conductores[]);   //linea
+void cargarArchivoDeProcesados(Infraccion infracciones[]);   //linea
+bool guardarArchivoDeConductores(Conductor conductores[], unsigned int cantidad);
+bool guardarArchivoDeProcesados(Infraccion infracciones[], unsigned int cantidad);
+Conductor nuevoConductor(const Conductor conductores[]);   //linea
+unsigned int conductoresTotales(Conductor conductores[]);   //linea
+void desactivarConductor(Conductor conductores[], unsigned int conductorID);   //linea
 void seleccionarFecha(unsigned int &fecha);   //linea
 void pausa(void);   //linea
 void limpiar(void);   //linea
 void eliminar(string nombreDelArchivo);   //linea
 string seleccionarProvincia();   //linea
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-int main(void){
-    string const mes[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+
+// ---------------------------- FUNCION PRINCIPAL ---------------------------- //
+
+int main(){
     char provincia[23];
-    unsigned int conductorID, opcion = 0, ultimo = 0;
-    Conductor infractores[TAM];
-    inicializar(infractores);
-    generarConducores();
+    unsigned int conductorID, opcion, ultimo = 0;
+    Conductor conductores[TAM];
+    Infraccion infracciones[TAM];
+    inicializar( conductores );
+    cout << "Desea generar un archivos de prueba?  0=NO, 1=SI  "<< endl;
+    cin >> opcion;
+    if( opcion ){
+        generarConducores();
+        generarInfracciones();
+    }
+    opcion = 0;
 
     while(true){
         switch(opcion){
             case 0:
                 limpiar();
                 cout << "[1] Comenzar jornada" << endl;
-                cout << "[2] Ver infractores" << endl;
+                cout << "[2] Ver conductores" << endl;
                 cout << "[3] Cargar conductor" << endl;
                 cout << "[4] Desactivar conductor" << endl;
                 cout << "[5] Buscar conductor" << endl;
-                cout << "[6] Procesar Lote de infractores" << endl;
-                cout << "[7] Listar infracciones" << endl;
+                cout << "[6] Procesar Lote de infracciones" << endl;
+                cout << "[7] Ver infracciones" << endl;
+                //cargar infraccion;
                 cout << "[8] Listar conductores con infracciones por provicia" << endl;
                 cout << "[9] Finalizar jornada" << endl;
                 cout << "[10] Salir del programa" << endl;
@@ -78,21 +97,22 @@ int main(void){
                 limpiar();
                 break;
             case 1:
-                generarConducores();
-                cargarArchivoDeConductores( infractores );
+                cargarArchivoDeConductores( conductores );
+                cargarArchivoDeProcesados( infracciones );
+                cout << "Los archivos han sido cargados exitosamente" <<endl<<endl;
                 pausa();
                 opcion = 0;
                 break;
             case 2:
-                verInfractores(infractores);
+                verInfractores(conductores);
                 pausa();
                 opcion = 0;
                 break;
             case 3:
-                ultimo = conductoresTotales( infractores );
+                ultimo = conductoresTotales( conductores );
                 if(ultimo < TAM){
-                    infractores[ultimo] = nuevoConductor( infractores );
-                    archivarConductor( infractores[ultimo] );
+                    conductores[ultimo] = nuevoConductor( conductores );
+                    archivarConductor( conductores[ultimo] );
                 } else {
                     cout << "ERROR: No se pueden agregar conductores" <<endl<< endl;
                     pausa();
@@ -102,12 +122,12 @@ int main(void){
             case 4:
                 cout << "Ingrese el ID del conductor a desactivar:   ";
                 cin >> conductorID;
-                desactivarConductor( infractores, conductorID );
+                desactivarConductor( conductores, conductorID );
                 pausa();
                 opcion = 0;
                 break;
             case 5:
-                buscarConductor( infractores );
+                buscarConductor( conductores );
                 pausa();
                 opcion = 0;
                 break;
@@ -127,7 +147,10 @@ int main(void){
                 opcion = 0;
                 break;
             case 9:
+                ultimo = conductoresTotales( conductores );
                 //finalizarJornada()
+                guardarArchivoDeConductores( conductores, ultimo );
+                guardarArchivoDeProcesados( infracciones, ultimo );
                 opcion = 0;
                 break;
             case 10:
@@ -139,9 +162,61 @@ int main(void){
         }
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void generarInfracciones(){}
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- ARCHIVAR EN CONDUCTORES.BIN ---------------------------- //
+
+bool guardarArchivoDeConductores(Conductor conductores[], unsigned int cantidad){
+    FILE *archivo;
+    archivo = fopen("conductores.bin","wb");
+    if(!archivo){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return false;
+    } else {
+        fwrite( conductores, sizeof(Conductor),cantidad ,archivo );
+        fclose( archivo );
+        return true;
+    }
+}
+
+// ---------------------------- ARCHIVAR EN PROCESADOS.BIN ---------------------------- //
+
+bool guardarArchivoDeProcesados(Infraccion infracciones[], unsigned int cantidad){
+    FILE *archivo;
+    archivo = fopen("procesados.bin" ,"wb" );
+    if( !archivo ){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        return false;
+    } else {
+        fwrite( infracciones, sizeof(Infraccion) ,cantidad ,archivo );
+        fclose( archivo );
+        return true;
+    }
+}
+
+// ---------------------------- INFRACCIONES DE PRUEBA ---------------------------- //
+
+void generarInfracciones(){
+    const string provincia[23] = { "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Corrientes", "Cordoba", "Entre Rios", "Formosa", "Jujuy", "Neuquen", "Mendoza", "Misiones", "La Pampa", "La Rioja", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe","Santiago del Estero", "Tierra del Fuego", "Tucuman"};
+    FILE *archivo;
+    Infraccion prueba[23];
+    for(int i=0 ; i<20 ; i++){
+        prueba[i].InfraccionID = i+1;
+        prueba[i].ConductorID = i+1;
+        //prueba[i].FechaHora = (i < 30) ? (i+1)+20200800 : (i%30+1)*20200800; // 'i+1' de agosto de 2020
+        prueba[i].Monto = i*100;
+        strcpy(prueba[i].Provincia, provincia[(i+23)%23].c_str());
+    }
+    archivo = fopen("procesados.bin","wb");
+    if( !archivo ){
+        cout << "ERROR: No se pudo abrir el archivo" << endl;
+    } else {
+        fwrite( prueba, sizeof(Infraccion),23, archivo );
+        fclose( archivo );
+    }
+}
+
+// ---------------------------- CONDUCTORES DE PRUEBA ---------------------------- //
+
 void generarConducores(){
     FILE *archivo;
     Conductor prueba[20];
@@ -159,26 +234,30 @@ void generarConducores(){
         fclose(archivo);
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void desactivarConductor(Conductor infractores[], unsigned int id){
+
+// ---------------------------- DESACTIVAR UN CONDUCTOR ---------------------------- //
+
+void desactivarConductor(Conductor conductores[], unsigned int id){
     bool desactivar;
-    if(!buscarXid(infractores, id)){
+    if(!buscarXid(conductores, id)){
         return;
     }
     limpiar();
     cout << "DATOS DEL CONDUCTOR" << endl;
-    mostrarDatos(infractores[id]);
-    if(infractores[id].Activo == true){
+    mostrarDatos(conductores[id]);
+    if(conductores[id].Activo == true){
         cout << endl << "Esta seguro de que quiere desactivar a este conductor? 0=NO, 1=SI:   ";
         cin >> desactivar;
-        infractores[id].Activo = !desactivar;
+        conductores[id].Activo = !desactivar;
         cout << "Conductor Desactivado" << endl << endl;
     } else {
         cout << "El conductor ya se encuentra inactivo" << endl <<endl;
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-Conductor nuevoConductor(const Conductor infractores[]) {
+
+// ---------------------------- AGREGAR CONDUCTOR ---------------------------- //
+
+Conductor nuevoConductor(const Conductor conductores[]) {
     Conductor infractor;
     bool datosCorrectos;
     do{
@@ -186,7 +265,7 @@ Conductor nuevoConductor(const Conductor infractores[]) {
             limpiar();
             cout << "Ingrese el ID del conductor: ";
             cin >> infractor.ConductorID;
-            if(buscarXid(infractores, infractor.ConductorID)){
+            if(buscarXid(conductores, infractor.ConductorID)){
                     cout << "ERROR: El ID ya se encuentra registrado" << endl;
                     infractor.ConductorID = VACIO;
                     pausa();
@@ -214,7 +293,9 @@ Conductor nuevoConductor(const Conductor infractores[]) {
     limpiar();
     return infractor;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- ARCHIVAR UN CONDUCTOR---------------------------- //
+
 void archivarConductor(Conductor infractor) {
     FILE* archivoDeConductores;
     archivoDeConductores= fopen("conductores.bin", "ab");
@@ -226,8 +307,10 @@ void archivarConductor(Conductor infractor) {
         fclose(archivoDeConductores);
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void cargarArchivoDeConductores(Conductor infractores[]) {
+
+// ---------------------------- CARGAR CONDUCTORES.BIN ---------------------------- //
+
+void cargarArchivoDeConductores(Conductor conductores[]) {
     FILE* archivoDeConductores;
     unsigned long tam;
     archivoDeConductores = fopen("conductores.bin", "rb");
@@ -238,30 +321,55 @@ void cargarArchivoDeConductores(Conductor infractores[]) {
         fseek(archivoDeConductores ,0 ,SEEK_END);                //se para en el final del archivo
         tam = ftell(archivoDeConductores)/sizeof(Conductor); //tam = pesoDelArchivo/pesoDeCadaConductor
         fseek(archivoDeConductores ,0 ,SEEK_SET);                //se para en el inicio del archivo
-        fread(infractores ,sizeof(Conductor), tam, archivoDeConductores);   //lee 'tam' conductores de archivo y guarda en infractores
+        fread(conductores ,sizeof(Conductor), tam, archivoDeConductores);   //lee 'tam' conductores de archivo y guarda en conductores
         fclose(archivoDeConductores);
-        cout << "El archivo ha sido cargado exitosamente" <<endl<<endl;
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-unsigned int conductoresTotales(Conductor infractores[]){
+
+// ---------------------------- CARGAR PROCESADOS.BIN ---------------------------- //
+
+void cargarArchivoDeProcesados(Infraccion infracciones[]) {
+    FILE* archivoDeProcesados;
+    unsigned long tam;
+    archivoDeProcesados = fopen("procesados.bin", "rb");
+    if(!archivoDeProcesados){
+        cout << "ERROR: No se pudo abrir el archivo de conductores" << endl;
+        return;
+    } else {
+        fseek( archivoDeProcesados ,0 ,SEEK_END);                //se para en el final del archivo
+        tam = ftell( archivoDeProcesados )/sizeof( Infraccion ); //tam = pesoDelArchivo/pesoDeCadaConductor
+        fseek( archivoDeProcesados ,0 ,SEEK_SET );                //se para en el inicio del archivo
+        fread( infracciones ,sizeof( Infraccion ), tam, archivoDeProcesados );   //lee 'tam' conductores de archivo y guarda en conductores
+        fclose( archivoDeProcesados );
+    }
+}
+
+// ---------------------------- CONTAR CONDUCTORES ---------------------------- //
+
+unsigned int conductoresTotales(Conductor conductores[]){
     unsigned int i;
-    for(i=0 ; infractores[i].ConductorID!=VACIO && i<TAM ; i++){}
+    for(i=0 ; conductores[i].ConductorID!=VACIO && i<TAM ; i++){}
     return i;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- INICIALIZAR CONDUCTORES ---------------------------- //
+
 void inicializar(Conductor conductores[]){
     for(unsigned int i=0; i<TAM ; i++) {
             conductores[i].ConductorID = VACIO;
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- LIMPIAR PANTALLA ---------------------------- //
+
 void limpiar() {
     string orden;
     orden = (strcmp(OS, "linux")==0)? "clear" : "cls";
     system(orden.c_str());
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- UNA PEQUEÑA PAUSA ---------------------------- //
+
 void pausa(){
     char seguir[1];
     cout << "PRESIONE ENTER PARA CONTINUAR...";
@@ -269,7 +377,9 @@ void pausa(){
     cin.getline(seguir,0);
     limpiar();
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- SELECCIONAR UNA FECHA VALIDA ---------------------------- //
+
 void seleccionarFecha(unsigned int &fecha){
     unsigned const short diasDelMes[12] ={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     unsigned int dd, mm, aaaa;
@@ -296,7 +406,9 @@ void seleccionarFecha(unsigned int &fecha){
     limpiar();
     fecha = aaaa*10000 + mm*100 + dd;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- BUSCAR CONDUCTOR POR EMAIL ---------------------------- //
+
 bool buscarXcorreo(const Conductor infractor[], unsigned int &indice){
     indice = 0;
     char email[50];
@@ -313,7 +425,9 @@ bool buscarXcorreo(const Conductor infractor[], unsigned int &indice){
     cout << "El conductor con Email \"" <<email<<"\" no ha sido encontrado"<<endl;
     return false;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- BUSCAR CONDUCTOR POR ID ---------------------------- //
+
 bool buscarXid(const Conductor infractor[], unsigned int &buscado){
     unsigned int id = buscado;
     for(int i=0 ; i<TAM ; i++){
@@ -325,7 +439,9 @@ bool buscarXid(const Conductor infractor[], unsigned int &buscado){
     cout << "El conductor con ID \"" <<id<< "\" no ha sido encontrado" <<  endl;
     return false;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- VER DATOS DE UN CONDUCTOR ---------------------------- //
+
 void mostrarDatos(const Conductor infractor){
     string estado = ( infractor.Activo != 0) ? "Activo" : "Inactivo";
     cout <<"Conductor ID: " <<infractor.ConductorID <<endl;
@@ -334,14 +450,9 @@ void mostrarDatos(const Conductor infractor){
     cout <<"Total de infracciones: "<<infractor.Infracciones<<endl;
     cout <<"Email: "<<infractor.Email<<endl<<endl;
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void eliminar(string nombreDelArchivo){
-    string comando;
-    comando = (strcmp(OS, "linux")==0) ? "rm " : "del ";
-    comando.append(nombreDelArchivo);
-    system(comando.c_str());
-}
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- CREAR UN LOTE ---------------------------- //
+
 void CrearLote(){
     string  const provincia[23] = { "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Corrientes", "Cordoba", "Entre Rios", "Formosa", "Jujuy", "Neuquen", "Mendoza", "Misiones", "La Pampa", "La Rioja", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe","Santiago del Estero", "Tierra del Fuego", "Tucuman"};
     char opcion;
@@ -368,14 +479,14 @@ void CrearLote(){
                 limpiar();
                 if ( opcion == 's' || opcion == 'S' ) {
                     cout<<"ingrese la id de la infracción:   ";
-                    cin >> infra.infraccionID;
+                    cin >> infra.InfraccionID;
                     cout<<"ingrese la fecha y hora de la infracción (use el formato AAAAMMDDHH:MM):   ";
-                    cin >> infra.fechahora;
+                    cin >> infra.FechaHora;
                     cout << "ingrese el monto de la infracción:   ";
-                    cin >> infra.monto;
+                    cin >> infra.Monto;
                     cout << "ingrese el id del conductor:   ";
-                    cin >> infra.conductorID;
-                    strcpy( infra.Provicia, seleccionarProvincia().c_str() );
+                    cin >> infra.ConductorID;
+                    strcpy( infra.Provincia, seleccionarProvincia().c_str() );
                     fwrite(&infra , sizeof(Infraccion) ,1 , archivo);
                     limpiar();
                 }
@@ -394,14 +505,25 @@ void CrearLote(){
         fclose(archivo);
     }
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ---------------------------- ELIMINAR UN LOTE ---------------------------- //
+
 void eliminarLote(){
     string nombre;
     cout << "Escriba el nombre completo del archivo que quiere eliminar:    ";
     cin >> nombre;
     eliminar(nombre);
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void eliminar(string nombreDelArchivo){
+    string comando;
+    comando = (strcmp(OS, "linux")==0) ? "rm " : "del ";
+    comando.append(nombreDelArchivo);
+    system(comando.c_str());
+}
+
+// ---------------------------- ELEGIR PROVINCA ---------------------------- //
+
 string seleccionarProvincia(){
     unsigned int seleccion;
     const string provincia[23] = { "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Corrientes", "Cordoba", "Entre Rios", "Formosa", "Jujuy", "Neuquen", "Mendoza", "Misiones", "La Pampa", "La Rioja", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe","Santiago del Estero", "Tierra del Fuego", "Tucuman"};
@@ -420,8 +542,10 @@ string seleccionarProvincia(){
     }while( seleccion > 23);
     return provincia[seleccion];
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void verInfractores(Conductor infractores[]){
+
+// ---------------------------- VER INFRACTORES ---------------------------- //
+
+void verInfractores(Conductor conductores[]){
     unsigned int seleccion = 0;
     limpiar();
     do{
@@ -438,27 +562,27 @@ void verInfractores(Conductor infractores[]){
             limpiar();
             break;
         case 1:
-            verTodos( infractores );
+            verTodos( conductores );
             seleccion = EXIT;
             break;
         case 2:
-            //verMorosos( infractores );
+            //verMorosos( conductores );
             seleccion = EXIT;
             break;
         case 3:
-            //verVencidos( infractores );
+            //verVencidos( conductores );
             seleccion = EXIT;
             break;
         case 4:
-            //verMasDeTresInfracciones( infractores );
+            //verMasDeTresInfracciones( conductores );
             seleccion = EXIT;
             break;
         case 5:
-            verActivos( infractores );
+            verActivos( conductores );
             seleccion = EXIT;
             break;
         case 6:
-            verInactivos( infractores );
+            verInactivos( conductores );
             seleccion = EXIT;
             break;
         case EXIT:
@@ -469,35 +593,40 @@ void verInfractores(Conductor infractores[]){
         }
     }while(seleccion != EXIT);
 }
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void verInactivos(Conductor infractores[]){
+
+// ---------------------------- VER CONDUCTORES INACTIVOS ---------------------------- //
+
+void verInactivos(Conductor conductores[]){
     for(int i=0 ; i<TAM ; i++){
-        if( (infractores[i].Activo == false) && (infractores[i].ConductorID != VACIO) ){
-            mostrarDatos( infractores[i] );
+        if( (conductores[i].Activo == false) && (conductores[i].ConductorID != VACIO) ){
+            mostrarDatos( conductores[i] );
         }
     }
-    pausa();
-}
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void verActivos(Conductor infractores[]){
-    for(int i=0 ; i<TAM ; i++){
-        if( (infractores[i].Activo == true) && (infractores[i].ConductorID != VACIO) ){
-            mostrarDatos( infractores[i] );
-        }
-    }
-    pausa();
-}
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void verTodos(const Conductor infractores[]){
-    for(int i=0 ; i<TAM ; i++){
-        if( (infractores[i].Infracciones >= 1) && (infractores[i].ConductorID != VACIO) ){
-            mostrarDatos( infractores[i] );
-        }
-    }
-    pausa();
 }
 
-void buscarConductor(Conductor infractores[]){
+// ---------------------------- VER CONDUCTORES ACTIVOS ---------------------------- //
+
+void verActivos(Conductor conductores[]){
+    for(int i=0 ; i<TAM ; i++){
+        if( (conductores[i].Activo == true) && (conductores[i].ConductorID != VACIO) ){
+            mostrarDatos( conductores[i] );
+        }
+    }
+}
+
+// ---------------------------- VER TODOS LOS CONDUCTORES ---------------------------- //
+
+void verTodos(const Conductor conductores[]){
+    for(int i=0 ; i<TAM ; i++){
+        if( (conductores[i].Infracciones >= 1) && (conductores[i].ConductorID != VACIO) ){
+            mostrarDatos( conductores[i] );
+        }
+    }
+}
+
+// ---------------------------- BUSCAR CONDUCTOR ---------------------------- //
+
+void buscarConductor(Conductor conductores[]){
     unsigned int seleccion = 0, buscado;
     limpiar();
     do{
@@ -514,16 +643,16 @@ void buscarConductor(Conductor infractores[]){
             case 1:
                 cout << "ingrese el ID del conductor:  ";
                 cin >> buscado;
-                if(buscarXid( infractores, buscado ) ){
+                if(buscarXid( conductores, buscado ) ){
                     cout << endl <<"DATOS DEL CONDUCTOR"<< endl;
-                    mostrarDatos( infractores[buscado] );
+                    mostrarDatos( conductores[buscado] );
                 }
                 seleccion = EXIT;
                 break;
             case 2:
-                if(buscarXcorreo( infractores, buscado ) ){
+                if(buscarXcorreo( conductores, buscado ) ){
                     cout << "DATOS DEL CONDUCTOR"<< endl << endl;
-                    mostrarDatos( infractores[buscado] );
+                    mostrarDatos( conductores[buscado] );
                 }
                 seleccion = EXIT;
                 break;
@@ -534,4 +663,68 @@ void buscarConductor(Conductor infractores[]){
                 break;
         }
     }while(seleccion != EXIT);
+}
+
+// ---------------------------- INFRACCIONES EN 'X' PROVINCIA---------------------------- //
+
+bool InfraccionesXProvincia ( char provincia[], Conductor conductores[] ){
+    FILE* archivoDeConductores;
+    FILE* archivoDeProcesados;
+    //Conductor conductorActual;
+    Infraccion infraccionActual;
+    bool encontrado;
+    unsigned int buscado;
+
+    archivoDeProcesados = fopen( "procesados.bin" , "rb" );
+    archivoDeConductores = fopen( "conductores.bin", "rb" );
+    if ( (archivoDeProcesados == NULL) || (archivoDeConductores == NULL) ){
+        cout << "ERROR: No se pudieron abrir los registros" << endl;
+        return false;
+    } else {
+        while ( !feof( archivoDeProcesados ) ){
+            fread( &infraccionActual, sizeof( Infraccion ),1, archivoDeProcesados );
+            if ( strcmp( provincia, infraccionActual.Provincia ) == 0 ){
+                limpiar();
+                buscado = infraccionActual.ConductorID;
+                encontrado = buscarXid( conductores , buscado );
+                if( encontrado ){
+                    mostrarDatos( conductores[ buscado ]);
+                    cout << endl;
+                    mostrarInfraccion( infraccionActual );
+                    cout << "======================================" << endl;
+                }
+            }
+        }
+        if ( encontrado==false ){
+            cout << "No hay registros de infracciones en esta provincia";
+        }
+    }
+    fclose(archivoDeProcesados);
+    fclose(archivoDeConductores);
+    return encontrado;
+}
+
+// ---------------------------- MOSTRAR UNA INFRACCION ---------------------------- //
+
+void mostrarInfraccion(Infraccion actual){
+    char fecha[8], hora[5];
+    int i;
+    for( i=0 ; i < 8 ; i++){
+        fecha[i] = actual.FechaHora[i];
+    }
+    for( i=0 ; i < 5 ; i++){
+        hora[i] = actual.FechaHora[i+8];
+    }
+    cout << "Infraccion ID: " << actual.InfraccionID << endl;
+    cout << "Conductor ID: " << actual.ConductorID << endl;
+    cout << "Fecha: ";
+    puts( fecha );
+    cout << endl;
+    cout << "Hora: ";
+    puts( hora );
+    cout << endl;
+    cout << "Monto: " << actual.Monto << endl;
+    cout << "Provincia: ";
+    puts( actual.Provincia );
+    cout << endl;
 }
