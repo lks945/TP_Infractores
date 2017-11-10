@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <cstring>
 #define VACIO 0
 #define MENU 0
