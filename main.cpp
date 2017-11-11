@@ -6,7 +6,7 @@
 #define VACIO 0
 #define MENU 0
 #define EXIT 11
-#define TAM 1000
+#define TAM 100
 // Macro para detectar el sistema operativo ejecutando el programa
 #ifdef __linux__
 #define OS "linux"
@@ -36,44 +36,45 @@ struct Infraccion {
 
 // ---------------------------- PROTOTIPOS DE FUNCIONES ---------------------------- //
 
-/*LINEA 182*/ void limpiar(void);
-/*LINEA 190*/ void pausa(void);
-/*LINEA 200*/ void inicializar(Conductor conductores[], Infraccion infracciones[]);
-/*LINEA 210*/ unsigned int conductoresTotales(Conductor conductores[]);
-/*LINEA 218*/ unsigned int infraccionesTotales(Infraccion infracciones[]);
-/*LINEA 226*/ string seleccionarFecha();
-/*LINEA 260*/ string seleccionarProvincia();
-/*LINEA 281*/ Conductor nuevoConductor(const Conductor conductores[]);
-/*LINEA 317*/ Infraccion nuevaInfraccion(const Infraccion infracciones[], Conductor conductores[]);
-/*LINEA 353*/ void desactivarConductor(Conductor conductores[], unsigned int conductorID);
-/*LINEA 374*/ void verConductores(Conductor conductores[]);
-/*LINEA 441*/ void mostrarDatos(const Conductor infractor);
-/*LINEA 454*/ void verTodos(const Conductor conductores[]);
-/*LINEA 462*/ void verMasDeTresInfracciones(Conductor conductores[]);
-/*LINEA 472*/ void verInactivos(Conductor conductores[]);
-/*LINEA 482*/ void verActivos(Conductor conductores[]);
-/*LINEA 492*/ void verVencidos(Conductor conductores[]);
-/*LINEA 505*/ void verInfracciones(Conductor conductores[], Infraccion infracciones[]);
-/*LINEA 572*/ void mostrarInfraccion(Infraccion actual);
-/*LINEA 593*/ void verTodas(const Infraccion infracciones[]);
-/*LINEA 601*/ bool infraccionesPorProvincia ( char provincia[], Conductor conductores[], Infraccion infracciones[] );
-/*LINEA 625*/ void infraccionesPorConductor( unsigned int IDbuscado, Infraccion infracciones[] );
-/*LINEA 641*/ void buscarConductor(Conductor conductores[]);
-/*LINEA 699*/ bool buscarConductorPorID(const Conductor conductores[], unsigned int &idBuscado);
-/*LINEA 712*/ bool buscarConductorPorEmail(const Conductor conductores[], unsigned int &indice);
-/*LINEA 731*/ bool buscarInfraccionPorID(const Infraccion infracciones[], unsigned int &buscado);
-/*LINEA 744*/ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]);
-/*LINEA 831*/ bool cargarLoteDeConductores(Conductor conductores[], string nombre);
-/*LINEA 850*/ bool cargarLoteDeInfracciones(Infraccion infracciones[], string nombre);
-/*LINEA 869*/ bool guardarConductoresEnLote(Conductor conductores[], string nombre);
-/*LINEA 884*/ bool guardarInfraccionesEnLote(Infraccion Infracciones[], string nombre);
-/*LINEA 899*/ void crearLote();
-/*LINEA 928*/ void generarConducores();
-/*LINEA 957*/ void generarInfracciones();
-/*LINEA 979*/ bool guardarArchivoDeConductores(Conductor conductores[]);
-/*LINEA 1001*/ bool guardarArchivoDeProcesados(Infraccion infracciones[]);
-/*LINEA 1019*/ string tiempoActual(string modo);
-/*LINEA 1039*/ void actualizarVencidos(Conductor conductores[]);
+/*LINEA 183*/ void limpiar(void);
+/*LINEA 191*/ void pausa(void);
+/*LINEA 201*/ void inicializar(Conductor conductores[], Infraccion infracciones[]);
+/*LINEA 211*/ unsigned int conductoresTotales(Conductor conductores[]);
+/*LINEA 219*/ unsigned int infraccionesTotales(Infraccion infracciones[]);
+/*LINEA 227*/ string seleccionarFecha();
+/*LINEA 261*/ string seleccionarProvincia();
+/*LINEA 282*/ Conductor nuevoConductor(const Conductor conductores[]);
+/*LINEA 318*/ Infraccion nuevaInfraccion(const Infraccion infracciones[], Conductor conductores[]);
+/*LINEA 355*/ void desactivarConductor(Conductor conductores[], unsigned int conductorID);
+/*LINEA 376*/ void verConductores(Conductor conductores[]);
+/*LINEA 443*/ void mostrarDatos(const Conductor infractor);
+/*LINEA 456*/ void verTodos(const Conductor conductores[]);
+/*LINEA 464*/ void verMasDeTresInfracciones(Conductor conductores[]);
+/*LINEA 474*/ void verInactivos(Conductor conductores[]);
+/*LINEA 484*/ void verActivos(Conductor conductores[]);
+/*LINEA 494*/ void verVencidos(Conductor conductores[]);
+/*LINEA 507*/ void verInfracciones(Conductor conductores[], Infraccion infracciones[]);
+/*LINEA 574*/ void mostrarInfraccion(Infraccion actual);
+/*LINEA 595*/ void verTodas(const Infraccion infracciones[]);
+/*LINEA 603*/ bool infraccionesPorProvincia ( char provincia[], Conductor conductores[], Infraccion infracciones[] );
+/*LINEA 627*/ void infraccionesPorConductor( unsigned int IDbuscado, Infraccion infracciones[] );
+/*LINEA 643*/ void buscarConductor(Conductor conductores[]);
+/*LINEA 701*/ bool buscarConductorPorID(const Conductor conductores[], unsigned int &idBuscado);
+/*LINEA 714*/ bool buscarConductorPorEmail(const Conductor conductores[], unsigned int &indice);
+/*LINEA 733*/ bool buscarInfraccionPorID(const Infraccion infracciones[], unsigned int &buscado);
+/*LINEA 746*/ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]);
+/*LINEA 836*/ bool cargarLoteDeConductores(Conductor conductores[], string nombre);
+/*LINEA 860*/ bool cargarLoteDeInfracciones(Infraccion infracciones[], string nombre);
+/*LINEA 890*/ bool guardarConductoresEnLote(Conductor conductores[], string nombre);
+/*LINEA 905*/ bool guardarInfraccionesEnLote(Infraccion Infracciones[], string nombre);
+/*LINEA 920*/ void crearLote();
+/*LINEA 949*/ void generarConducores();
+/*LINEA 978*/ void generarInfracciones();
+/*LINEA 1000*/ bool guardarArchivoDeConductores(Conductor conductores[]);
+/*LINEA 1022*/ bool guardarArchivoDeProcesados(Infraccion infracciones[]);
+/*LINEA 1040*/ string tiempoActual(string modo);
+/*LINEA 1060*/ void actualizarVencidos(Conductor conductores[]);
+/*LINEA 1073*/void actualizarInfraccionesTotales(Conductor conductores[], Infraccion infracciones[]);
 
 // ---------------------------- FUNCION PRINCIPAL ---------------------------- //
 
@@ -83,7 +84,6 @@ int main(){
     Infraccion infracciones[TAM];
     inicializar( conductores, infracciones);
     ultimo = opcion = MENU;
-
     while( true ){
         switch( opcion ){
             case MENU:
@@ -788,6 +788,7 @@ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]){
             cout << "Ingrese el nombre del lote (con su extension) :   ";
             cin >> nombre;
             cargarLoteDeInfracciones( infracciones, nombre );
+            actualizarInfraccionesTotales(conductores, infracciones);
             guardarArchivoDeProcesados( infracciones );
             pausa();
             limpiar();
@@ -813,6 +814,7 @@ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]){
         case 6:
             cargarLoteDeConductores( conductores, "PruebaDeConductores.bin" );
             cargarLoteDeInfracciones( infracciones, "PruebaDeInfracciones.bin" );
+            actualizarInfraccionesTotales(conductores, infracciones);
             opcion = EXIT;
             break;
         case 7:
@@ -1055,7 +1057,7 @@ string tiempoActual(string modo) {
         return horaDelSistema;
 }
 
-// ---------------------------- ACTUALIZAR VENCIDOS---------------------------- //
+// ---------------------------- ACTUALIZAR VENCIDOS ---------------------------- //
 
 void actualizarVencidos(Conductor conductores[]){
     unsigned int i;
@@ -1064,6 +1066,18 @@ void actualizarVencidos(Conductor conductores[]){
     for( i=0 ; i<TAM && conductores[i].ConductorID!=VACIO ; i++ ){
         if( strcmp( fechaActual, conductores[i].FechaVencimiento ) > 0 ){
             conductores[i].Activo = false;
+        }
+    }
+}
+
+// ---------------------------- ACTUALIZAR INFRACCIONES ---------------------------- //
+
+void actualizarInfraccionesTotales(Conductor conductores[], Infraccion infracciones[]){
+    unsigned int buscado, i;
+    for( i=0 ; i<TAM && infracciones[i].InfraccionID!=VACIO ; i++ ){
+        buscado = infracciones[i].ConductorID;
+        if( buscarConductorPorID(conductores, buscado) ){
+            conductores[buscado].Infracciones++;
         }
     }
 }
