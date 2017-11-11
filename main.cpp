@@ -497,7 +497,7 @@ void verVencidos(Conductor conductores[]){
     char fechaActual[9];
     strcpy( fechaActual, tiempoActual("fecha").c_str());
     for( i=0 ; i<TAM && conductores[i].ConductorID!=VACIO ; i++ ){
-        if( strcmp(fechaActual, conductores[i].FechaVencimiento) < 0 ){
+        if( strcmp(fechaActual, conductores[i].FechaVencimiento) > 0 ){
             mostrarDatos(conductores[i]);
         }
     }
@@ -787,6 +787,7 @@ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]){
             cout << "Ingrese el nombre del lote (con su extension) :   ";
             cin >> nombre;
             cargarLoteDeInfracciones( infracciones, nombre );
+            guardarArchivoDeProcesados( infracciones );
             pausa();
             limpiar();
             opcion = EXIT;
@@ -834,7 +835,11 @@ void operacionesConLotes(Conductor conductores[], Infraccion infracciones[]){
 bool cargarLoteDeConductores( Conductor conductores[], string nombre ){
     FILE *archivo;
     unsigned int tam;
-    archivo = fopen( nombre.c_str(), "rb" );
+    if( strcmp(nombre.c_str(), "Conductores.bin")==0){
+        archivo = fopen( nombre.c_str(), "ab+" );
+    } else {
+        archivo = fopen( nombre.c_str(), "rb" );
+    }
     if ( !archivo ) {
         cout << "ERROR: No se pudo abrir el lote." << endl;
         return false;
@@ -844,6 +849,7 @@ bool cargarLoteDeConductores( Conductor conductores[], string nombre ){
         fseek( archivo ,0 ,SEEK_SET );
         fread( conductores ,sizeof(Conductor), tam, archivo );
     }
+    actualizarVencidos( conductores );
     fclose( archivo );
     return true;
 }
@@ -853,7 +859,13 @@ bool cargarLoteDeConductores( Conductor conductores[], string nombre ){
 bool cargarLoteDeInfracciones( Infraccion infracciones[], string nombre ){
     FILE *archivo;
     unsigned int tam;
-    archivo = fopen( nombre.c_str(), "rb" );
+    bool flag=true;
+    if( strcmp(nombre.c_str(), "Procesados.bin")==0){
+        archivo = fopen( nombre.c_str(), "ab+" );
+        flag=false;
+    } else {
+        archivo = fopen( nombre.c_str(), "rb" );
+    }
     if ( !archivo ) {
         cout << "ERROR: No se pudo abrir el lote." << endl;
         return false;
@@ -864,6 +876,11 @@ bool cargarLoteDeInfracciones( Infraccion infracciones[], string nombre ){
         fread( infracciones ,sizeof(Infraccion), tam, archivo );
     }
     fclose( archivo );
+    if( flag ){
+        archivo = fopen("Procesados.bin", "ab+");
+        fwrite(infracciones, sizeof(Infraccion), tam, archivo );
+        fclose(archivo);
+    }
     return true;
 }
 
@@ -982,7 +999,7 @@ void generarInfracciones(){
 bool guardarArchivoDeConductores(Conductor conductores[]){
     FILE *archivo;
     unsigned int i;
-    archivo = fopen("conductores.bin","wb+");
+    archivo = fopen("Conductores.bin","wb+");
     if(!archivo){
         cout << "ERROR: No se pudo abrir el archivo" << endl;
         return false;
@@ -1004,7 +1021,7 @@ bool guardarArchivoDeConductores(Conductor conductores[]){
 bool guardarArchivoDeProcesados(Infraccion infracciones[]){
     FILE *archivo;
     unsigned int i;
-    archivo = fopen("procesados.bin" ,"ab+" );
+    archivo = fopen("Procesados.bin" ,"ab+" );
     if( !archivo ){
         cout << "ERROR: No se pudo abrir el archivo" << endl;
         return false;
@@ -1044,7 +1061,7 @@ void actualizarVencidos(Conductor conductores[]){
     char fechaActual[9];
     strcpy( fechaActual, tiempoActual("fecha").c_str());
     for( i=0 ; i<TAM && conductores[i].ConductorID!=VACIO ; i++ ){
-        if( strcmp(fechaActual, conductores[i].FechaVencimiento) < 0 ){
+        if( strcmp( fechaActual, conductores[i].FechaVencimiento ) > 0 ){
             conductores[i].Activo = false;
         }
     }
