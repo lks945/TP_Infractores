@@ -6,7 +6,7 @@
 #define VACIO 0
 #define MENU 0
 #define EXIT 11
-#define TAM 100
+#define TAM 1000
 // Macro para detectar el sistema operativo ejecutando el programa
 #ifdef __linux__
 #define OS "linux"
