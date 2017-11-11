@@ -344,6 +344,7 @@ Infraccion nuevaInfraccion(const Infraccion infracciones[], Conductor conductore
         cout << endl << "Los datos son correctos? 0=NO, 1=SI" << endl;
         cin >> datosCorrectos;
     }while( !datosCorrectos );
+    buscar = nueva.ConductorID;
     if( buscarConductorPorID(conductores, buscar) ){
         conductores[buscar].Infracciones++;
     }
